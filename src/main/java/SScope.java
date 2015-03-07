@@ -10,7 +10,7 @@ import java.util.Map;
 
 @FunctionalInterface
 interface BiFunctionWithThrow<T, U, R> {
-    R apply(T t, U u) throws Exception;
+    R apply(T t, U u);
 }
 
 public class SScope {
@@ -26,7 +26,7 @@ public class SScope {
     }
 
     //生成AST
-    public static SExpression parseAsIscheme(String code) throws Exception {
+    public static SExpression parseAsIscheme(String code){
         SExpression program = new SExpression("", null);
         SExpression current = program;
         for (String lex : Lexer.tokenize(code)) {
@@ -47,7 +47,7 @@ public class SScope {
     }
 
     //在作用域链表中查找对应符号
-    public SObject find(String name) throws Exception {
+    public SObject find(String name){
         SScope current = this;
         while (current != null) {
             if (current.variableTable.containsKey(name)) {
@@ -55,7 +55,7 @@ public class SScope {
             }
             current = current.parent;
         }
-        throw new Exception(name + " is not defined.");
+        throw new RuntimeException(name + " is not defined.");
     }
 
     //只查找当前作用域
@@ -65,9 +65,9 @@ public class SScope {
     }
 
     //构建新作用域
-    public SScope spawnScopeWith(String[] names, SObject[] values) throws Exception {
+    public SScope spawnScopeWith(String[] names, SObject[] values){
         if (names.length < values.length) {
-            throw new Exception("Too many arguments");
+            throw new RuntimeException("Too many arguments");
         }
         SScope scope = new SScope(this);
         for (int i = 0; i < values.length; i++) {
@@ -107,8 +107,8 @@ public class SScope {
         }
     }
 
-    public static SBool chainRelation(SObject[] arguments, BiFunctionWithThrow<SNumber, SNumber, Boolean> relation) throws Exception {
-        if (arguments.length <= 1) throw new Exception("chainRelation exception...");
+    public static SBool chainRelation(SObject[] arguments, BiFunctionWithThrow<SNumber, SNumber, Boolean> relation){
+        if (arguments.length <= 1) throw new RuntimeException("chainRelation exception...");
         SNumber current = (SNumber) arguments[0];
 
         for (int i = 1; i < arguments.length; i++) {
@@ -120,10 +120,10 @@ public class SScope {
         return SBool.True;
     }
 
-    public static SList retrieveSList(SObject[] arguments, SScope scope, String operationName) throws Exception {
+    public static SList retrieveSList(SObject[] arguments, SScope scope, String operationName)  {
         SList list = null;
         if (arguments.length != 1 || (list = ((SList) arguments[0])) == null)
-            throw new Exception("#{operationName} must apply to a list.");
+            throw new RuntimeException("#{operationName} must apply to a list.");
         return list;
     }
 
@@ -157,22 +157,22 @@ public class SScope {
             }
             return new SNumber(firstValue / product);
         }).buildIn("%", (arguments, scope) -> {
-            if (arguments.length != 2) throw new Exception("parameters count in mod should be 2");
+            if (arguments.length != 2) throw new RuntimeException("parameters count in mod should be 2");
             return new SNumber(((SNumber) arguments[0]).value % ((SNumber) arguments[1]).value);
         }).buildIn("and", (arguments, scope) -> {
-            if (arguments.length <= 0) throw new Exception("");
+            if (arguments.length <= 0) throw new RuntimeException("");
             for (SObject b : arguments) {
                 if (!((SBool) b).value) return SBool.False;
             }
             return SBool.True;
         }).buildIn("or", (arguments, scope) -> {
-            if (arguments.length <= 0) throw new Exception("");
+            if (arguments.length <= 0) throw new RuntimeException("");
             for (SObject b : arguments) {
                 if (((SBool) b).value) return SBool.True;
             }
             return SBool.False;
         }).buildIn("not", (arguments, scope) -> {
-            if (arguments.length != 1) throw new Exception("");
+            if (arguments.length != 1) throw new RuntimeException("");
             return new SBool(!((SBool) arguments[0]).value);
         }).buildIn("=", (arguments, scope) -> {
             return chainRelation(arguments, (s1, s2) -> s1.value == s2.value);
@@ -194,7 +194,7 @@ public class SScope {
         }).buildIn("append", (arguments, scope) -> {
             SList list0 = null, list1 = null;
             if (arguments.length != 2 || (list0 = (SList) arguments[0]) == null || (list1 = (SList) arguments[1]) == null)
-                throw new Exception("Input must be two lists");
+                throw new RuntimeException("Input must be two lists");
             list0.values.addAll(list1.values);
             return list0;
         }).buildIn("empty?", (arguments, scope) -> {

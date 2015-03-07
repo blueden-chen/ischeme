@@ -26,30 +26,22 @@ public class SExpression {
             return this.value;
     }
 
-    public SList sLists(SExpression current, SScope scope) throws Exception {
+    public SList sLists(SExpression current, SScope scope) {
         List list = current.children.stream().skip(1).map(exp -> {
-            try {
-                return exp.evaluate(scope);
-            } catch (Exception e) {
-                System.out.println("sLists exception...");
-            }
-            return null;
+            return exp.evaluate(scope);
         }).collect(Collectors.toList());
         return new SList(list);
     }
 
-    public SObject[] sObjects(SExpression current, SScope scope) throws Exception {
+    //java lambda need param be final
+    public SObject[] sObjects(SExpression current, SScope scope) {
         return current.children.stream().skip(1).map(s -> {
-            try {
-                return s.evaluate(scope);
-            } catch (Exception e) {
-                System.out.println("sObjects exception...");
-            }
-            return null;
+            return s.evaluate(scope);
+
         }).toArray(SObject[]::new);
     }
 
-    public SObject evaluate(SScope scope) throws Exception {
+    public SObject evaluate(SScope scope) {
         SExpression current = this;
         while (true) {
 

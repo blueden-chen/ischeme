@@ -24,7 +24,7 @@ public class SFunction extends SObject {
     }
 
     //
-    public SObject evaluate() throws Exception {
+    public SObject evaluate(){
         String[] filledParameters = this.computeFilledParameters();
         if (filledParameters.length < parameters.length) {
             return this;
@@ -37,7 +37,7 @@ public class SFunction extends SObject {
     public String[] computeFilledParameters() {
         return Arrays.asList(this.parameters).stream().filter(p -> this.scope.findInTop(p) != null).toArray(String[]::new);
     }
-    public SFunction update(SObject[] arguments) throws Exception {
+    public SFunction update(SObject[] arguments){
         SObject[] existingArguments = Arrays.asList(this.parameters).stream().map(p -> this.scope.findInTop(p)).filter(obj -> obj != null).toArray(SObject[]::new);
         SObject[] newArguments = (SObject[]) ArrayUtils.addAll(existingArguments, arguments);
         SScope newScope = this.scope.parent.spawnScopeWith(this.parameters, newArguments);
